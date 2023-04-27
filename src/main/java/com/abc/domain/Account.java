@@ -45,11 +45,15 @@ public class Account {
     @CommandHandler
     public void handle(DebitAccountCommand command) {
         MonetaryAmount availableBalance = currentBalance.add(creditLimit);
-        if (availableBalance.subtract(command.getAmount()).isLessThan(Money.zero(Currency.getDefault()))) {
+        if (!hasSufficientFunds(availableBalance, command.getAmount())) {
             throw new InsufficientFundsException("Could not complete transaction. The withdrawal amount would exceed your overdraft limit.");
         }
 
         AggregateLifecycle.apply(new AccountDebitedEvent(command.getAccountId(), LocalDate.now(), command.getAmount()));
+    }
+
+    private boolean hasSufficientFunds(MonetaryAmount availableBalance, MonetaryAmount debitAmount) {
+        return availableBalance.subtract(debitAmount).isGreaterThanOrEqualTo(Money.zero(Currency.getDefault()));
     }
 
     @EventSourcingHandler
