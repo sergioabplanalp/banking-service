@@ -38,7 +38,7 @@ public class AccountController {
         return ResponseEntity.ok(id);
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<AccountResponse>> retrieveAccounts(@RequestParam(required = false) boolean indebted) {
         List<AccountView> accounts = applicationService.retrieveAccounts(indebted);
         List<AccountResponse> response = accounts.stream().map(AccountResponse::from).toList();
