@@ -24,7 +24,7 @@ public class Account {
 
     @AggregateIdentifier
     private UUID accountId;
-    private MonetaryAmount currentBalance = Money.zero(Currency.getDefault());
+    private MonetaryAmount currentBalance;
     private MonetaryAmount creditLimit;
 
     public Account() {
@@ -55,6 +55,7 @@ public class Account {
     @EventSourcingHandler
     public void handle(AccountOpenedEvent event) {
         this.accountId = event.getAccountId();
+        this.currentBalance = Money.zero(Currency.getDefault());
     }
 
     @EventSourcingHandler
