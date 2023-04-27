@@ -10,3 +10,4 @@
 .idea
 *.iml
 /.project
+/src/main/resources/static
