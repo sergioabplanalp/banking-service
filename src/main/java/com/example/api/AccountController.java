@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,6 +53,13 @@ public class AccountController {
     public ResponseEntity<List<AccountResponse>> retrieveAccounts() {
         List<AccountView> accounts = accountRepository.findAll();
         List<AccountResponse> response = accounts.stream().map(AccountResponse::from).toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/indebted")
+    public ResponseEntity<List<AccountResponse>> retrieveIndebtedAccounts() {
+        List<AccountView> accounts = accountRepository.findAllByBalanceAmountLessThan(BigDecimal.ZERO);
+        List<AccountResponse> response = accounts.stream().map(AccountResponse::from).collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
 
@@ -87,13 +93,6 @@ public class AccountController {
         }
 
         List<TransactionResponse> response = transactions.stream().map(TransactionResponse::from).collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/indebted")
-    public ResponseEntity<List<AccountResponse>> retrieveIndebtedAccounts() {
-        List<AccountView> accounts = accountRepository.findAllByBalanceAmountLessThan(BigDecimal.ZERO);
-        List<AccountResponse> response = accounts.stream().map(AccountResponse::from).collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
 
