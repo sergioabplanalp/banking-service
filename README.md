@@ -29,7 +29,8 @@ mvn spring-boot:run
 POST /api/accounts
 {
     "owner": string,
-    "depositAmount": double
+    "depositAmount": double,
+    "creditLine": double
 }
 
 # Retrieve list of accounts (option to only retrieve indebted accounts)
