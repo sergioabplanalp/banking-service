@@ -7,12 +7,13 @@ function OpenAccount() {
     const navigate = useNavigate();
     const [owner, setOwner] = useState('');
     const [depositAmount, setDepositAmount] = useState(0.0);
+    const [creditLine, setCreditLine] = useState(0.0);
 
     const openAccount = () => {
         const options = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({owner, depositAmount}),
+            body: JSON.stringify({owner, depositAmount, creditLine}),
         };
 
         fetch(`/api/accounts`, options)
@@ -47,6 +48,14 @@ function OpenAccount() {
                     </div>
                     <div className="col-2">
                         <input onChange={e => setDepositAmount(e.target.value)}/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="offset-3 col-3" style={{textAlign: "right"}}>
+                        Credit line:&nbsp;
+                    </div>
+                    <div className="col-2">
+                        <input onChange={e => setCreditLine(e.target.value)}/>
                     </div>
                 </div>
                 <div className="row">

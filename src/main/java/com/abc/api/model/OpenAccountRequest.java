@@ -10,4 +10,6 @@ public class OpenAccountRequest {
     private String owner;
     @Min(value = 0)
     private Double depositAmount;
+    @Min(value = 0)
+    private Double creditLine;
 }

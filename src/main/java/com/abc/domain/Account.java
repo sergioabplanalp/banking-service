@@ -16,14 +16,11 @@ import org.axonframework.spring.stereotype.Aggregate;
 import org.javamoney.moneta.Money;
 
 import javax.money.MonetaryAmount;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Aggregate
 public class Account {
-
-    private static final MonetaryAmount DEFAULT_CREDIT_LIMIT = Money.of(BigDecimal.valueOf(100), Currency.getDefault());
 
     @AggregateIdentifier
     private UUID accountId;
@@ -36,7 +33,7 @@ public class Account {
     @CommandHandler
     public Account(OpenAccountCommand command) {
         AggregateLifecycle.apply(new AccountOpenedEvent(command.getAccountId(), command.getOwner()));
-        AggregateLifecycle.apply(new CreditLimitGrantedEvent(command.getAccountId(), DEFAULT_CREDIT_LIMIT));
+        AggregateLifecycle.apply(new CreditLimitGrantedEvent(command.getAccountId(), command.getCreditLine()));
         AggregateLifecycle.apply(new AccountCreditedEvent(command.getAccountId(), LocalDate.now(), command.getDepositAmount()));
     }
 

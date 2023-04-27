@@ -6,6 +6,7 @@ import com.abc.domain.Currency;
 import com.abc.exception.InsufficientFundsException;
 import com.abc.query.account.AccountView;
 import com.abc.query.transactions.TransactionView;
+import jakarta.validation.Valid;
 import org.javamoney.moneta.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,9 +33,10 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<UUID> openBankAccount(@RequestBody OpenAccountRequest request) {
+    public ResponseEntity<UUID> openBankAccount(@Valid @RequestBody OpenAccountRequest request) {
         MonetaryAmount depositAmount = Money.of(request.getDepositAmount(), Currency.getDefault());
-        UUID id = applicationService.openBankAccount(request.getOwner(), depositAmount);
+        MonetaryAmount creditLine = Money.of(request.getCreditLine(), Currency.getDefault());
+        UUID id = applicationService.openBankAccount(request.getOwner(), depositAmount, creditLine);
         return ResponseEntity.ok(id);
     }
 
@@ -46,7 +48,7 @@ public class AccountController {
     }
 
     @PostMapping("/{accountId}/deposits")
-    public ResponseEntity<Void> deposit(@PathVariable String accountId, @RequestBody PaymentRequest request) {
+    public ResponseEntity<Void> deposit(@PathVariable String accountId, @Valid @RequestBody PaymentRequest request) {
         MonetaryAmount amount = Money.of(BigDecimal.valueOf(request.getAmount()), Currency.getDefault());
         applicationService.makeDeposit(UUID.fromString(accountId), amount);
         return ResponseEntity.ok().build();

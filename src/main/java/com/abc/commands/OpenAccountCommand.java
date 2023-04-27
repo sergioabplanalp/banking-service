@@ -16,4 +16,5 @@ public class OpenAccountCommand {
     private UUID accountId;
     private String owner;
     private MonetaryAmount depositAmount;
+    private MonetaryAmount creditLine;
 }

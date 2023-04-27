@@ -32,9 +32,9 @@ public class ApplicationService {
         this.transactionsRepository = transactionsRepository;
     }
 
-    public UUID openBankAccount(String owner, MonetaryAmount depositAmount) {
+    public UUID openBankAccount(String owner, MonetaryAmount depositAmount, MonetaryAmount creditLine) {
         UUID id = UUID.randomUUID();
-        commandGateway.sendAndWait(new OpenAccountCommand(id, owner, depositAmount));
+        commandGateway.sendAndWait(new OpenAccountCommand(id, owner, depositAmount, creditLine));
         return id;
     }
 

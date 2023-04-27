@@ -30,12 +30,13 @@ public class AccountTest {
     @Test
     public void openAccount() {
         Money depositAmount = Money.of(500, Currency.getDefault());
+        Money creditLine = Money.of(100, Currency.getDefault());
         fixture.given()
-                .when(new OpenAccountCommand(ACCOUNT_ID, OWNER, depositAmount))
+                .when(new OpenAccountCommand(ACCOUNT_ID, OWNER, depositAmount, creditLine))
                 .expectEvents(
                         new AccountOpenedEvent(ACCOUNT_ID, OWNER),
-                        new CreditLimitGrantedEvent(ACCOUNT_ID, Money.of(100, Currency.getDefault())),
-                        new AccountCreditedEvent(ACCOUNT_ID, LocalDate.now(), Money.of(500, Currency.getDefault()))
+                        new CreditLimitGrantedEvent(ACCOUNT_ID, creditLine),
+                        new AccountCreditedEvent(ACCOUNT_ID, LocalDate.now(), depositAmount)
                 );
     }
 
