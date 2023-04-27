@@ -1,9 +1,6 @@
 package com.example.api;
 
-import com.example.api.model.AccountResponse;
-import com.example.api.model.ErrorResponse;
-import com.example.api.model.OpenAccountRequest;
-import com.example.api.model.TransactionsResponse;
+import com.example.api.model.*;
 import com.example.domain.Currency;
 import com.example.domain.commands.CreditAccountCommand;
 import com.example.domain.commands.DebitAccountCommand;
@@ -18,13 +15,16 @@ import org.javamoney.moneta.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -57,16 +57,18 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/deposits")
-    public void deposit(@RequestParam String id, @RequestParam double amount) {
-        Money depositAmount = Money.of(BigDecimal.valueOf(amount), Currency.getDefault());
-        commandGateway.sendAndWait(new CreditAccountCommand(UUID.fromString(id), depositAmount));
+    @PostMapping("/{accountId}/deposits")
+    public ResponseEntity<Void> deposit(@PathVariable String accountId, @RequestBody PaymentRequest request) {
+        Money depositAmount = Money.of(BigDecimal.valueOf(request.getAmount()), Currency.getDefault());
+        commandGateway.sendAndWait(new CreditAccountCommand(UUID.fromString(accountId), depositAmount));
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/withdrawals")
-    public void withdraw(@RequestParam String id, @RequestParam double amount) {
-        Money depositAmount = Money.of(BigDecimal.valueOf(amount), Currency.getDefault());
-        commandGateway.sendAndWait(new DebitAccountCommand(UUID.fromString(id), depositAmount));
+    @PostMapping("/{accountId}/withdrawals")
+    public ResponseEntity<Void> withdraw(@PathVariable String accountId, @RequestBody PaymentRequest request) {
+        Money depositAmount = Money.of(BigDecimal.valueOf(request.getAmount()), Currency.getDefault());
+        commandGateway.sendAndWait(new DebitAccountCommand(UUID.fromString(accountId), depositAmount));
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("{accountId}")
@@ -77,10 +79,14 @@ public class AccountController {
     }
 
     @GetMapping("{accountId}/transactions")
-    public ResponseEntity<TransactionsResponse> retrieveTransactions(@PathVariable String accountId, @RequestParam LocalDate date) {
+    public ResponseEntity<List<TransactionResponse>> retrieveTransactions(@PathVariable String accountId, @RequestParam LocalDate date) {
         UUID id = UUID.fromString(accountId);
         List<TransactionView> transactions = transactionsRepository.findAllByAccountIdAndDateAfter(id, date);
-        TransactionsResponse response = TransactionsResponse.from(id, transactions);
+        if (CollectionUtils.isEmpty(transactions)) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+
+        List<TransactionResponse> response = transactions.stream().map(TransactionResponse::from).collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
 
