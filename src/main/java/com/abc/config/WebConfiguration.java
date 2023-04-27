@@ -1,6 +1,7 @@
 package com.abc.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 
 import java.io.IOException;
 
+@Profile("application")
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
     @Override
